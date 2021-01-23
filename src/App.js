@@ -1,45 +1,49 @@
 import './App.css';
-import { useState, useEffect} from 'react';
+import { useState} from 'react';
 import Flexbox from 'flexbox-react';
 import Time from './components/Time/Time'
-import { interval, Observable } from "rxjs";
+import { interval} from "rxjs";
+import { map } from "rxjs/operators";
 
+const delay = 1000;
 
-
-
-function Stopwatch() {
+const App = () => {
 const [timer, setTimer ] = useState(0);
-const [stopIncrement, setStopIncrement] = useState(0);
-const [timerOn, setTimerOn] = useState(false);;
-let increment = null;
+const [timerOn, setTimerOn] = useState(false);
+const [subscription, setSubscription] = useState("");
 
-
-let timerStream$ = new Observable(observer => {
-    const interval = setInterval(() => observer.next(timer =>timer +1),1000)
-    return () => clearInterval(interval)
-});
-
-const subscription = timerStream$.subscribe(val => console.log(val))
 
 const startTimer = () => {
   setTimerOn(true)
-  timerStream$.subscribe(timer => setTimer(timer))
+  if (!subscription) {
+    const timerSubscription = interval(delay)
+      .pipe(map((v) => v + 1))
+      .subscribe((v) => {
+        setTimer(v + timer);
+      });
+    setSubscription(timerSubscription);
+  }
   };
 
 const stopTimer  = () => {
   subscription.unsubscribe();
+  setTimer(0);
+  setSubscription("");
+  setTimerOn(false)
 }
 
   const resetTimer = () => {
-    clearInterval(timerStream$.subscribe(0));
-    setTimerOn(false);
-    setTimer(0);
-    startTimer();
+      subscription.unsubscribe();
+      const timerSubscription = interval(delay).subscribe((v) => {
+      setTimer(v);
+    });
+    setSubscription(timerSubscription);   
   };
 
   const waitTimer = () => {
-    clearInterval(timerStream$.subscribe());
-    setTimerOn(false);
+    subscription.unsubscribe();
+      setSubscription("");
+      setTimerOn(false)
   };
 
   return (
@@ -60,7 +64,7 @@ const stopTimer  = () => {
   );
 }
 
-export default Stopwatch;
+export default App;
 
 // import './App.css';
 // import { useState,useRef } from 'react';
