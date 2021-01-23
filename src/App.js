@@ -6,7 +6,6 @@ import { interval} from "rxjs";
 import { map } from "rxjs/operators";
 
 const delay = 1000;
-
 const App = () => {
 const [timer, setTimer ] = useState(0);
 const [timerOn, setTimerOn] = useState(false);
@@ -31,7 +30,9 @@ const startTimer = () => {
   }
 
   const resetTimer = () => {
-    subscription.unsubscribe();
+    if (subscription) {
+      subscription.unsubscribe();
+    }
     const timerSubscription = interval(delay).subscribe((t) => setTimer(t));
     setSubscription(timerSubscription);   
   };
