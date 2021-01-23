@@ -5,20 +5,20 @@ import Time from './components/Time/Time'
 import { interval} from "rxjs";
 import { map } from "rxjs/operators";
 
-
+const delay = 1000;
 
 const App = () => {
 const [timer, setTimer ] = useState(0);
 const [timerOn, setTimerOn] = useState(false);
 const [subscription, setSubscription] = useState("");
 
-const delay = 1000;
+
 const startTimer = () => {
   setTimerOn(true)
   if (!subscription) {
     const timerSubscription = interval(delay)
-      .pipe(map((v) => v + 1))
-      .subscribe((v) => setTimer(v + timer));
+      .pipe(map((timer) => timer + 1))
+      .subscribe((t) => setTimer(t + timer));
     setSubscription(timerSubscription);
   }
   };
@@ -32,7 +32,7 @@ const startTimer = () => {
 
   const resetTimer = () => {
     subscription.unsubscribe();
-    const timerSubscription = interval(delay).subscribe((v) => setTimer(v));
+    const timerSubscription = interval(delay).subscribe((t) => setTimer(t));
     setSubscription(timerSubscription);   
   };
 
